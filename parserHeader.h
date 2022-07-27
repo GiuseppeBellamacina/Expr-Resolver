@@ -19,25 +19,29 @@ void eraser(string& str, short n1=0, short n2=0){
 
 // serve a separare le sottoespressioni dando l'ultimo indice di ciascuna
 short last(string str, short n=0){
-	bool br = false;
-	int i;
-	for(i=n; i<str.length(); i++){
-		if(str[n] == '-') continue;
-		if(isdigit(str[i]) || str[i] == '.') continue;
-		switch(str[i]){
-			case '+':
-			case '-':
-			case '*':
-			case '/': br = true;
-		}
-		if(br) break;
+int i=n;
+if(str[i] == '-') i++;
+	while(isdigit(str[i])) i++;
+	if(str[i] == '.'){
+		i++;
+		while(isdigit(str[i])) i++;
 	}
-	for(i=i+1; i<str.length(); i++){
-		if(isdigit(str[i]) || str[i] == '.') continue;
-		break;
+	switch(str[i]){
+		case '+':
+        case '-':
+        case '*':
+        case '/':
+        	i++;
+        	break;
+        default:
+        	return i;
 	}
-	if(checkVal(str,n,i-1)) return n+i-1;
-	return i;
+	while(isdigit(str[i])) i++;
+	if(str[i] == '.'){
+		i++;
+		while(isdigit(str[i])) i++;
+	}
+	return i;	
 }
 
 // serve a risistemare la stringa
@@ -46,11 +50,12 @@ string insert(string str, string aux, short n=0){
 	return str;
 }
 
-// questo serve a vedere se l'espressione data è un singolo valore
+// questo serve a vedere se l'espressione data ï¿½ un singolo valore
 bool checkVal(string str, short n1=0, short n2=0){
 	if(!n2) n2 = str.length();
-	for(int i=n1; i<n2; i++){
-		if(str[n1] == '-') continue;
+	int i=n1;
+	if(str[n1] == '-') i++;
+	for(i=i; i<n2; i++){
 		if(str[i] == '.') continue;
 		if(!isdigit(str[i])) return false;	
 	}
@@ -75,7 +80,7 @@ double subExprVal(string str, short n1=0, short n2=0){
 	
 	for(iter=n1; iter<n2; iter++)
 		a += str[iter];
-	
+
 	stringstream ss;
     ss << a;
     ss >> num;
@@ -89,15 +94,15 @@ string subExpr(string str, short n1=0, short n2=0){
     string a = "", b = "";
     double num1, num2;
     char oper = ' ';
-    short iter=n1;
+    short iter;
     double ret;
     
     if(str[n1] == '-'){
 		a += '-';
-		iter++;
+		n1++;
 	}
   
-	for(iter=iter; (isdigit(str[iter])) || (str[iter] == '.'); iter++)
+	for(iter=n1; (isdigit(str[iter])) || (str[iter] == '.'); iter++)
 		a += str[iter];
     
 	stringstream ss1;
@@ -112,7 +117,7 @@ string subExpr(string str, short n1=0, short n2=0){
 			oper = str[iter];
 			break;
 		default:
-			cerr << "ERRORE" << endl << "d" <<str[iter] << "d";
+			cerr << "ERRORE" << endl;
 			exit(-1);
     }
     

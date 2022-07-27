@@ -5,6 +5,5 @@ int main(){
     cout << "Inserisci espressione:\t";
     cin >> espressione;
     cout << endl << "Il risultato dell'espressione inserita e':\t" << expr(espressione);
-
     return 0;
 }
