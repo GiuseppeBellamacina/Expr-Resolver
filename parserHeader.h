@@ -1,17 +1,8 @@
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 using namespace std;
-
-void eraser(string& str, short n1, short n2);
-short last(string str, short n);
-string insert(string str, string aux, short n);
-bool checkVal(string str, short n1, short n2);
-short checkOp(string str);
-short findSub(string str, int n);
-string subExprVal(string str, short n1, short n2);
-string subExpr(string str, short n1, short n2);
-double expr(string str, short n);
 
 // serve a cancellare la parte appena calcolata
 void eraser(string& str, short n1=0, short n2=0){
@@ -59,7 +50,7 @@ string insert(string str, string aux, short n=0){
 	return str;
 }
 
-// questo serve a vedere se l'espressione data � un singolo valore
+// questo serve a vedere se l'espressione data e' un singolo valore
 bool checkVal(string str, short n1=0, short n2=0){
 	if(!n2) n2 = str.length();
 	int i=n1;
@@ -99,11 +90,10 @@ string subExprVal(string str, short n1=0, short n2=0){
 	str = str.substr(n1, n2-n1);
 	int i=str.length()-1;
 
-	for(i=i; i>=0; i--){
-		if(isdigit(str[i])) continue;
-		if(str[i] != '.') break;
-		else br = true;
-		if(br) break;
+	while(isdigit(str[i])) i--;
+	if(str[i] == '.'){
+		i--;
+		while(isdigit(str[i])) i--;
 	}
 
 	a = str.substr(i+1);
@@ -194,23 +184,49 @@ string subExpr(string str, short n1=0, short n2=0){
 	return str;
 }
 
-double expr(string str){
+//serve a stampare i passaggi
+void print(fstream& file, string str, bool eq=true){
+	if(eq) file << str << "=" << endl;
+	else file << str << endl;
+	if(file.fail()){
+		cerr << "Errore durante la scrittura su file" << endl;
+		exit(-1);
+	}
+}
+
+double expr(string str, fstream& file){
+	file.open("output.txt", fstream::out | fstream::trunc);
+	if(!file){
+		cerr << "Errore nella creazione del file" << endl;
+		exit(-1);
+	}
+	print(file,str);
+
 	while(checkOp(str) != -1){
 		short n = findSub(str,checkOp(str));
 		string aux = subExpr(str,n,last(str,n));
 		eraser(str,n,last(str,n));
 		str = insert(str,aux,n);
+		print(file,str);
 	}
+
 	while(!checkVal(str)){
 		string aux = subExpr(str,0,last(str));
 		eraser(str,0,last(str));
 		str = insert(str,aux);
+		if(checkVal(str)) print(file,str,false);
+		else print(file,str);
 	}
-
+	
+	string aux = str;
 	double ret;
 	str = subExprVal(str);
+	if(str != aux) print(file,str,false);
+
 	stringstream ss;
 	ss << str;
 	ss >> ret;
+	file.close();
+
 	return ret;
 }
