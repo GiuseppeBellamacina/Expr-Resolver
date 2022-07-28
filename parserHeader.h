@@ -7,10 +7,11 @@ void eraser(string& str, short n1, short n2);
 short last(string str, short n);
 string insert(string str, string aux, short n);
 bool checkVal(string str, short n1, short n2);
-bool checkOp(string str, short n);
+short checkOp(string str);
+short findSub(string str, int n);
 string subExprVal(string str, short n1, short n2);
 string subExpr(string str, short n1, short n2);
-double expr(string str);
+double expr(string str, short n);
 
 // serve a cancellare la parte appena calcolata
 void eraser(string& str, short n1=0, short n2=0){
@@ -47,7 +48,14 @@ short last(string str, short n=0){
 
 // serve a risistemare la stringa
 string insert(string str, string aux, short n=0){
-	str = aux + str;
+	if(n==0){
+		str = aux + str;
+	}
+	else{
+		string a = str.substr(0,n);
+		str.erase(0,n);
+		str = a + aux + str;
+	}
 	return str;
 }
 
@@ -64,12 +72,23 @@ bool checkVal(string str, short n1=0, short n2=0){
 }
 
 // questo serve a vedere le precedenze degli operatori
-bool checkOp(string str, short n){
-    for(int i=n+1; i<str.length(); i++){
+short checkOp(string str){
+    for(int i=0; i<str.length(); i++){
         if(str[i] == '*' || str[i] == '/')
-            return true;
+            return i;
     }
-    return false;
+    return -1;
+}
+
+// serve a tornare la posizione da cui far partire la sottoespressione
+short findSub(string str, int n){
+	short iter = checkOp(str)-1;
+	while(isdigit(str[iter])) iter--;
+	if(str[iter] == '.'){
+		iter--;
+		while(isdigit(str[iter])) iter--;
+	}
+	return iter+1;
 }
 
 // questa e' la sottoespressione a valore singolo
@@ -176,11 +195,16 @@ string subExpr(string str, short n1=0, short n2=0){
 }
 
 double expr(string str){
+	while(checkOp(str) != -1){
+		short n = findSub(str,checkOp(str));
+		string aux = subExpr(str,n,last(str,n));
+		eraser(str,n,last(str,n));
+		str = insert(str,aux,n);
+	}
 	while(!checkVal(str)){
 		string aux = subExpr(str,0,last(str));
 		eraser(str,0,last(str));
 		str = insert(str,aux);
-		expr(str);
 	}
 
 	double ret;
