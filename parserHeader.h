@@ -19,8 +19,8 @@ void eraser(string& str, short n1=0, short n2=0){
 
 // serve a separare le sottoespressioni dando l'ultimo indice di ciascuna
 short last(string str, short n=0){
-int i=n;
-if(str[i] == '-') i++;
+	int i=n;
+	if(str[i] == '-') i++;
 	while(isdigit(str[i])) i++;
 	if(str[i] == '.'){
 		i++;
@@ -94,67 +94,71 @@ string subExpr(string str, short n1=0, short n2=0){
     string a = "", b = "";
     double num1, num2;
     char oper = ' ';
-    short iter;
+    short iter=n1;
     double ret;
     
     if(str[n1] == '-'){
 		a += '-';
-		n1++;
+		iter++;
 	}
-  
-	for(iter=n1; (isdigit(str[iter])) || (str[iter] == '.'); iter++)
-		a += str[iter];
-    
-	stringstream ss1;
-    ss1 << a;
-    ss1 >> num1;
-    
-	switch (str[iter]){
-        case '+':
+
+	while(iter<n2){
+		for(iter=iter; isdigit(str[iter]); iter++) a += str[iter];
+		if(str[iter] == '.'){
+			a += '.';
+			for(iter=iter+1; isdigit(str[iter]); iter++) a += str[iter];
+		}
+
+		stringstream ss1;
+		ss1 << a;
+		ss1 >> num1;
+
+		switch(str[iter]){
+		case '+':
         case '-':
         case '*':
         case '/':
 			oper = str[iter];
-			break;
-		default:
-			cerr << "ERRORE" << endl;
+        	break;
+        default:
+        	cerr << "ERRORE: operatore non valido" << endl;
 			exit(-1);
-    }
-    
-    for(iter=iter+1; iter<n2; iter++){
-    	if(!isdigit(str[iter])){
-    		if(str[iter] == '.' || str[iter] == '-'){
-				b += str[iter];
-				continue;
-			}
-    		cerr << "ERRORE" << endl;
-			exit(-1);
-    	}
-    	else b += str[iter];
+		}
+
+		if(str[iter+1] == '-'){
+			b += '-';
+			iter++;
+		}
+
+		for(iter=iter+1; isdigit(str[iter]); iter++) b += str[iter];
+		if(str[iter] == '.'){
+			b += '.';
+			for(iter=iter+1; isdigit(str[iter]); iter++) b += str[iter];
+		}
+
+		stringstream ss2;
+		ss2 << b;
+		ss2 >> num2;
 	}
-	
-    stringstream ss2;
-    ss2 << b;
-    ss2 >> num2;
-    
-    switch((char)oper){
-        case '+':
-            ret = num1+num2;
-            break;
-    	case '-':
-            ret = num1-num2;
-            break;
+
+	switch(oper){
+		case '+':
+			ret = num1+num2;
+			break;
+        case '-':
+			ret = num1-num2;
+			break;
         case '*':
-            ret = num1*num2;
-            break;
+			ret = num1*num2;
+			break;
         case '/':
-            ret = num1/num2;
-    }
-    
-    stringstream ss3;
-    ss3 << ret;
-    ss3 >> str;
-    return str;
+			ret = num1/num2;
+	}
+
+	stringstream ss;
+	ss << ret;
+	ss >> str;
+	return str;
 }
 
 double expr(string str){
