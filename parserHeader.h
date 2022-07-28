@@ -55,7 +55,7 @@ string insert(string str, string aux, short n=0){
 bool checkVal(string str, short n1=0, short n2=0){
 	if(!n2) n2 = str.length();
 	int i=n1;
-	if(str[n1] == '-') i++;
+	while(str[i] == '-') i++;
 	for(i=i; i<n2; i++){
 		if(str[i] == '.') continue;
 		if(!isdigit(str[i])) return false;	
@@ -76,13 +76,30 @@ bool checkOp(string str, short n){
 string subExprVal(string str, short n1=0, short n2=0){
 	if(!n2) n2 = str.length();
 	string a = "";
-	double num;
-	short iter = n1;
-	
-	for(iter=n1; iter<n2; iter++)
-		a += str[iter];
+	bool br = false;
+	str = str.substr(n1, n2-n1);
+	int i=str.length()-1;
 
-	return a;
+	for(i=i; i>=0; i--){
+		if(isdigit(str[i])) continue;
+		if(str[i] != '.') break;
+		else br = true;
+		if(br) break;
+	}
+
+	a = str.substr(i+1);
+	stringstream ss;
+	ss << a;
+	double aux;
+	ss >> aux;
+
+	str.erase(i+1);
+	if(str.length()%2) aux = -aux;
+
+	stringstream ss1;
+	ss1 << aux;
+	ss1 >> str;
+	return str;
 }
 
 // serve a eseguire le operazioni elementari tra 2 operandi
