@@ -8,7 +8,7 @@ short last(string str, short n);
 string insert(string str, string aux, short n);
 bool checkVal(string str, short n1, short n2);
 bool checkOp(string str, short n);
-double subExprVal(string str, short n1, short n2);
+string subExprVal(string str, short n1, short n2);
 string subExpr(string str, short n1, short n2);
 double expr(string str);
 
@@ -36,6 +36,7 @@ short last(string str, short n=0){
         default:
         	return i;
 	}
+	if(str[i] == '-') i++;
 	while(isdigit(str[i])) i++;
 	if(str[i] == '.'){
 		i++;
@@ -72,7 +73,7 @@ bool checkOp(string str, short n){
 }
 
 // questa e' la sottoespressione a valore singolo
-double subExprVal(string str, short n1=0, short n2=0){
+string subExprVal(string str, short n1=0, short n2=0){
 	if(!n2) n2 = str.length();
 	string a = "";
 	double num;
@@ -81,11 +82,7 @@ double subExprVal(string str, short n1=0, short n2=0){
 	for(iter=n1; iter<n2; iter++)
 		a += str[iter];
 
-	stringstream ss;
-    ss << a;
-    ss >> num;
-    
-    return num;
+	return a;
 }
 
 // serve a eseguire le operazioni elementari tra 2 operandi
@@ -168,5 +165,11 @@ double expr(string str){
 		str = insert(str,aux);
 		expr(str);
 	}
-	return subExprVal(str);
+
+	double ret;
+	str = subExprVal(str);
+	stringstream ss;
+	ss << str;
+	ss >> ret;
+	return ret;
 }
