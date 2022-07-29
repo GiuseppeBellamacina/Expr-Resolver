@@ -186,16 +186,41 @@ string subExpr(string str, short n1=0, short n2=0){
 
 //serve a stampare i passaggi
 void print(fstream& file, string str, bool eq=true){
-	if(eq) file << str << "=" << endl;
-	else file << str << endl;
+	if(eq){
+		file << str << "=" << endl;
+		cout << str << "=" << endl;
+	}
+	else{
+		file << str << endl;
+		cout << str << endl;
+	}
 	if(file.fail()){
 		cerr << "Errore durante la scrittura su file" << endl;
 		exit(-1);
 	}
 }
 
+// serve a dare il nome al file
+string setName(string str){
+	string ret = "Expr_";
+	for(int i=0; i<str.length(); i++){
+		switch(str[i]){
+			case '*':
+				ret += 'x';
+				break;
+			case '/':
+				ret += "div";
+				break;
+			default: ret += str[i];
+		}
+	}
+	ret += ".txt";
+	return ret;
+}
+
 double expr(string str, fstream& file){
-	file.open("output.txt", fstream::out | fstream::trunc);
+	string name = setName(str);
+	file.open(name, fstream::out | fstream::app);
 	if(!file){
 		cerr << "Errore nella creazione del file" << endl;
 		exit(-1);
