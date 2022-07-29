@@ -209,7 +209,7 @@ string setName(string str){
 				ret += 'x';
 				break;
 			case '/':
-				ret += "div";
+				ret += 'v';
 				break;
 			default: ret += str[i];
 		}
