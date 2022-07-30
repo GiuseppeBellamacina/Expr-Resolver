@@ -185,14 +185,15 @@ string subExpr(string str, short n1=0, short n2=0){
 }
 
 //serve a stampare i passaggi
-void print(fstream& file, string str, bool eq=true){
-	if(eq){
-		file << str << "=" << endl;
-		cout << str << "=" << endl;
+void print(fstream& file, string str, bool output, bool print_file){
+	if(!(output || print_file)) return;
+	if(checkVal(str) && (str[0]!='-' && str[1] != '-')){
+		if(print_file) file << str << endl;
+		if(output) cout << str << endl;
 	}
 	else{
-		file << str << endl;
-		cout << str << endl;
+		if(print_file) file << str << "=" << endl;
+		if(output) cout << str << "=" << endl;
 	}
 	if(file.fail()){
 		cerr << "Errore durante la scrittura su file" << endl;
@@ -218,40 +219,42 @@ string setName(string str){
 	return ret;
 }
 
-double expr(string str, fstream& file){
-	string name = setName(str);
-	file.open(name, fstream::out | fstream::app);
-	if(!file){
-		cerr << "Errore nella creazione del file" << endl;
-		exit(-1);
+double expr(string str, fstream& file, bool output=false, bool print_file=false){
+	if(print_file){
+		string name = setName(str);
+		file.open(name, fstream::out | fstream::app);
+		if(!file){
+			cerr << "Errore nella creazione del file" << endl;
+			exit(-1);
+		}
 	}
-	print(file,str);
+	print(file,str,true,print_file);
 
 	while(checkOp(str) != -1){
 		short n = findSub(str,checkOp(str));
 		string aux = subExpr(str,n,last(str,n));
 		eraser(str,n,last(str,n));
 		str = insert(str,aux,n);
-		print(file,str);
+		print(file,str,output,print_file);
 	}
 
 	while(!checkVal(str)){
 		string aux = subExpr(str,0,last(str));
 		eraser(str,0,last(str));
 		str = insert(str,aux);
-		if(checkVal(str)) print(file,str,false);
-		else print(file,str);
+		if(checkVal(str)) print(file,str,output,print_file);
+		else print(file,str,output,print_file);
 	}
 	
 	string aux = str;
 	double ret;
 	str = subExprVal(str);
-	if(str != aux) print(file,str,false);
+	if(str != aux) print(file,str,output,print_file);
 
 	stringstream ss;
 	ss << str;
 	ss >> ret;
-	file.close();
+	if(print_file) file.close();
 
 	return ret;
 }
