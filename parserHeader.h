@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -228,7 +229,7 @@ double expr(string str, fstream& file, bool output=false, bool print_file=false)
 			exit(-1);
 		}
 	}
-	print(file,str,true,print_file);
+	print(file,str,output,print_file);
 
 	while(checkOp(str) != -1){
 		short n = findSub(str,checkOp(str));
@@ -255,6 +256,7 @@ double expr(string str, fstream& file, bool output=false, bool print_file=false)
 	ss << str;
 	ss >> ret;
 	if(print_file) file.close();
+	if(!output) cout << ret;
 
 	return ret;
 }
