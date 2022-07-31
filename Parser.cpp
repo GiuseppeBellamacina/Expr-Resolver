@@ -8,5 +8,6 @@ int main(){
     cin >> espressione;
     cout << endl << "Risoluzione espressione:" << endl << endl;
     expr(espressione,file,true);
+    cout << endl;
     return 0;
 }

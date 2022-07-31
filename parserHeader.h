@@ -64,8 +64,9 @@ bool checkVal(string str, short n1=0, short n2=0){
 }
 
 // questo serve a vedere le precedenze degli operatori
-short checkOp(string str){
-    for(int i=0; i<str.length(); i++){
+short checkOp(string str, short n1=0, short n2=0){
+	if(!n2) n2 = str.length();
+    for(int i=n1; i<n2; i++){
         if(str[i] == '*' || str[i] == '/')
             return i;
     }
@@ -73,8 +74,8 @@ short checkOp(string str){
 }
 
 // serve a tornare la posizione da cui far partire la sottoespressione
-short findSub(string str, int n){
-	short iter = checkOp(str)-1;
+short findSub(string str, int n, int n1=0, int n2=0){
+	short iter = checkOp(str,n1,n2)-1;
 	while(isdigit(str[iter])) iter--;
 	if(str[iter] == '.'){
 		iter--;
@@ -220,6 +221,33 @@ string setName(string str){
 	return ret;
 }
 
+bool checkPar(string str){
+	for(int i=0; i<str.length(); i++)
+		if(str[i] == '(') return true;
+	return false;
+}
+
+short* parHandler(string str){
+	short* ret = new short[2];
+	short f=0;
+	for(int i=0; i<str.length(); i++){
+		if(str[i] == '('){
+			ret[0] = i;
+			f = i+1;
+		}
+	}
+	for(int i=f; i<str.length(); i++)
+		if(str[i] == ')') ret[1] = i;
+	return ret;
+}
+
+string parDel(string str, short n1, short n2){
+	string aux = subExprVal(str,n1+1,n2);
+	eraser(str,n1,n2+1);
+	str = insert(str,aux,n1);
+	return str;
+}
+
 double expr(string str, fstream& file, bool output=false, bool print_file=false){
 	if(print_file){
 		string name = setName(str);
@@ -230,6 +258,32 @@ double expr(string str, fstream& file, bool output=false, bool print_file=false)
 		}
 	}
 	print(file,str,output,print_file);
+
+	while(checkPar(str)){
+		short* par = parHandler(str);
+		
+		while(checkOp(str,par[0]+1,par[1]) != -1){
+			short n = findSub(str,checkOp(str,par[0]+1,par[1]),par[0]+1,par[1]);
+			string aux = subExpr(str,n,last(str,n));
+			eraser(str,n,last(str,n));
+			str = insert(str,aux,n);
+			par = parHandler(str);
+			print(file,str,output,print_file);
+		}
+
+		while(!checkVal(str,par[0]+1,par[1])){
+			short n = par[0]+1;
+			string aux = subExpr(str,n,last(str,n));
+			eraser(str,n,last(str,n));
+			str = insert(str,aux,n);
+			par = parHandler(str);
+			print(file,str,output,print_file);
+		}
+
+		par = parHandler(str);
+		str = parDel(str,par[0],par[1]);
+		print(file,str,output,print_file);
+	}
 
 	while(checkOp(str) != -1){
 		short n = findSub(str,checkOp(str));
