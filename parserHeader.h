@@ -189,9 +189,15 @@ string subExpr(string str, short n1=0, short n2=0){
 //serve a stampare i passaggi
 void print(fstream& file, string str, bool output, bool print_file){
 	if(!(output || print_file)) return;
-	if(checkVal(str) && (str[0]!='-' && str[1] != '-')){
-		if(print_file) file << str << endl;
-		if(output) cout << str << endl;
+	if(checkVal(str)){
+		if(str[0]=='-' && str[1]=='-'){
+			if(print_file) file << str << "=" << endl;
+			if(output) cout << str << "=" << endl;
+		}
+		else{
+			if(print_file) file << str << endl;
+			if(output) cout << str << endl;
+		}
 	}
 	else{
 		if(print_file) file << str << "=" << endl;
@@ -221,12 +227,14 @@ string setName(string str){
 	return ret;
 }
 
+// controlla se ci sono le parentesi
 bool checkPar(string str){
 	for(int i=0; i<str.length(); i++)
 		if(str[i] == '(') return true;
 	return false;
 }
 
+// serve a trovare gli indici delle parentesi corrispondenti
 short* parHandler(string str){
 	short* ret = new short[2];
 	short f=0;
@@ -236,11 +244,16 @@ short* parHandler(string str){
 			f = i+1;
 		}
 	}
-	for(int i=f; i<str.length(); i++)
-		if(str[i] == ')') ret[1] = i;
+	for(int i=f; i<str.length(); i++){
+		if(str[i] == ')'){
+			ret[1] = i;
+			break;
+		}
+	}
 	return ret;
 }
 
+// serva a cancellare le parentesi dopo il calcolo
 string parDel(string str, short n1, short n2){
 	string aux = subExprVal(str,n1+1,n2);
 	eraser(str,n1,n2+1);
@@ -248,6 +261,7 @@ string parDel(string str, short n1, short n2){
 	return str;
 }
 
+// si tratta della funzione principale
 double expr(string str, fstream& file, bool output=false, bool print_file=false){
 	if(print_file){
 		string name = setName(str);
@@ -310,7 +324,7 @@ double expr(string str, fstream& file, bool output=false, bool print_file=false)
 	ss << str;
 	ss >> ret;
 	if(print_file) file.close();
-	if(!output) cout << ret;
+	if(!output) cout << ret << endl;
 
 	return ret;
 }
