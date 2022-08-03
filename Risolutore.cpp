@@ -7,7 +7,8 @@ int main(){
     cout << "Inserisci espressione:\t";
     cin >> espressione;
     cout << endl << "Risoluzione espressione:" << endl << endl;
-    expr(espressione,file,true);
+    expr(espressione,file,true,true);
     cout << endl;
+    system("pause");
     return 0;
 }
